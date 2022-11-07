@@ -149,3 +149,22 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.start_button.setText(_translate("MainWindow", "Start"))
+        self.labe_hackenl.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:32pt; font-weight:600; color:#aaff00;\">✔</span></p></body></html>"))
+        self.reset_button.setText(_translate("MainWindow", "Reset"))
+        self.label_Work_Rest.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600; color:#000000;\">Work</span></p></body></html>"))
+        self.label_timer.setText(_translate("MainWindow", " 00:00:00"))
+        self.label_date_now.setText(_translate("MainWindow", "Today is: 28.03.2022 // 12:30"))
+        self.pause_button.setText(_translate("MainWindow", "Pause"))
+
+        self.label_Work_interval.setText(_translate("MainWindow", "Work interval"))
+        self.lineEdit_input_work_interval.setPlaceholderText(_translate("MainWindow", "25"))
+        self.label_Small_Pause_interval.setText(_translate("MainWindow", "Small Pause interval"))
+        self.lineEdit_input_small_pause_interval.setText(_translate("MainWindow", "5"))
+        self.label_Big_Pause_interval.setText(_translate("MainWindow", "Big Pause interval"))
+        self.lineEd_input_big_pause_interval.setText(_translate("MainWindow", "30"))
+        self.lineEd_input_big_pause_interval.setPlaceholderText(_translate("MainWindow", "25"))
