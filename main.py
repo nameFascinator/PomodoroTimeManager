@@ -147,3 +147,50 @@ class Tomate(QtWidgets.QWidget):
 
                     self.ui.label_timer.setText(f" 0{self.minutes}:0{self.seconds}:0{self.milliseconds}")
                     self.counting = True
+
+    def date(self):
+        today = datetime.datetime.now()  # time now
+        form = today.strftime("%d.%m.%Y // %H:%M:%S")  # EU time format
+        self.ui.label_date_now.setText(f"Today is: {form}")  # show data and time
+
+    def start_timer(self):  # начинамем отсчет
+        self.pause_time = False
+        if self.was_paused == False:
+            self.start_timer_position = datetime.datetime.now() + datetime.timedelta(minutes=self.input_work_interval,
+                                                                                     seconds=0)
+        else:
+            self.start_timer_position = datetime.datetime.now() + datetime.timedelta(minutes=self.input_work_interval,
+                                                                                     seconds=-self.copy_old_time_difference)
+
+        self.time_difference = (self.input_work_interval * 60) - (
+                    self.start_timer_position - datetime.datetime.now()).total_seconds()
+        self.ui.label_Work_Rest.setText("Work")
+        self.ui.label_color_left.setStyleSheet("background-color: rgb(0, 170, 0);")
+        self.ui.label_color_right.setStyleSheet("background-color: rgb(0, 170, 0);")
+        self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(0, 170, 0);")
+
+        self.counting = True  # start count True
+
+        if self.counting == True:
+            self.timer = QTimer()  # create object QTimer
+            self.timer.setInterval(10)  # Set the interval with which the program will call the recurring timer
+            # function responsible for counting the timer.
+            self.timer.timeout.connect(self.recurring_timer)
+            self.timer.start()  # start Qtimer object
+        else:
+            self.timer.stop()  # stop Qtimer object if counting False
+
+        self.was_paused = False
+
+    def pause_timer(self):  # stop counting, put on stop
+        self.was_paused = True
+        self.copy_old_time_difference = int(self.minutes * 60) + int(self.seconds)
+
+        if self.counting == False:
+            pass
+        else:
+            self.ui.label_color_left.setStyleSheet("background-color: rgb(255, 170, 170);")
+            self.ui.label_color_right.setStyleSheet("background-color: rgb(255, 170, 170);")
+            self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(255, 170, 170);")
+            self.ui.label_Work_Rest.setText("Waiting...")
+            self.timer.stop()
