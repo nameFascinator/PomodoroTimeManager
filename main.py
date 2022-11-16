@@ -163,7 +163,7 @@ class Tomate(QtWidgets.QWidget):
                                                                                      seconds=-self.copy_old_time_difference)
 
         self.time_difference = (self.input_work_interval * 60) - (
-                    self.start_timer_position - datetime.datetime.now()).total_seconds()
+                self.start_timer_position - datetime.datetime.now()).total_seconds()
         self.ui.label_Work_Rest.setText("Work")
         self.ui.label_color_left.setStyleSheet("background-color: rgb(0, 170, 0);")
         self.ui.label_color_right.setStyleSheet("background-color: rgb(0, 170, 0);")
@@ -194,3 +194,60 @@ class Tomate(QtWidgets.QWidget):
             self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(255, 170, 170);")
             self.ui.label_Work_Rest.setText("Waiting...")
             self.timer.stop()
+
+    def recurring_timer(self):  # start_time
+        if self.minutes == 0 and self.seconds == 0 and self.milliseconds == 0 and self.pause_time == False and self.worked_time < 4:
+            winsound.PlaySound(".//files//Alert and Work.wav", winsound.SND_ASYNC)
+
+        self.minutes = str(int(self.time_difference / 60))
+        self.seconds = str(int(self.time_difference % 60))
+        self.milliseconds = str(
+            int((round(self.time_difference % 60, 4) - int(round(self.time_difference % 60, 4))) * 100))
+
+        if len(self.milliseconds) == 1:
+            self.milliseconds = "0" + self.milliseconds
+
+        if len(self.seconds) == 1:
+            self.seconds = "0" + self.seconds
+
+        if len(self.minutes) == 1:
+            self.minutes = "0" + self.minutes
+
+        self.ui.label_timer.setText(f" {self.minutes}:{self.seconds}:{self.milliseconds}")
+
+        if self.milliseconds[0] == "0":
+            self.milliseconds = int(self.milliseconds[1])
+        else:
+            self.milliseconds = int(self.milliseconds)
+
+        if self.seconds[0] == "0":
+            self.seconds = int(self.seconds[1])
+        else:
+            self.seconds = int(self.seconds)
+
+        if self.minutes[0] == "0":
+            self.minutes = int(self.minutes[1])
+        else:
+            self.minutes = int(self.minutes)
+
+        self.minutes = int(self.time_difference / 60)
+        self.seconds = int(self.time_difference % 60)
+        self.milliseconds = int((round(self.time_difference % 60, 4) - int(round(self.time_difference % 60, 4))) * 100)
+
+        if self.pause_time == False and self.worked_time < 4:
+            self.time_difference = (self.input_work_interval * 60) - (
+                        self.start_timer_position - datetime.datetime.now()).total_seconds()
+            self.convert_to_procent = (self.minutes * 60 + self.seconds) / (int(self.input_work_interval) * 60 / 100)
+            self.ui.progressBar.setProperty("value", self.convert_to_procent)
+
+        if self.pause_time == True and self.worked_time < 4:
+            self.time_difference = (self.input_small_pause_interval * 60) - (
+                        self.start_timer_position - datetime.datetime.now()).total_seconds()
+            self.convert_to_procent = (self.minutes * 60 + self.seconds) / (self.input_small_pause_interval * 60 / 100)
+            self.ui.progressBar.setProperty("value", self.convert_to_procent)
+
+        if self.pause_time == True and self.worked_time == 4:
+            self.time_difference = (self.input_big_pause_interval * 60) - (
+                        self.start_timer_position - datetime.datetime.now()).total_seconds()
+            self.convert_to_procent = (self.minutes * 60 + self.seconds) / (self.input_big_pause_interval * 60 / 100)
+            self.ui.progressBar.setProperty("value", self.convert_to_procent)
