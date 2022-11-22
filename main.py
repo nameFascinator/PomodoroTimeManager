@@ -153,7 +153,7 @@ class Tomate(QtWidgets.QWidget):
         form = today.strftime("%d.%m.%Y // %H:%M:%S")  # EU time format
         self.ui.label_date_now.setText(f"Today is: {form}")  # show data and time
 
-    def start_timer(self):  # начинамем отсчет
+    def start_timer(self):  # start counting
         self.pause_time = False
         if self.was_paused == False:
             self.start_timer_position = datetime.datetime.now() + datetime.timedelta(minutes=self.input_work_interval,
@@ -236,18 +236,57 @@ class Tomate(QtWidgets.QWidget):
 
         if self.pause_time == False and self.worked_time < 4:
             self.time_difference = (self.input_work_interval * 60) - (
-                        self.start_timer_position - datetime.datetime.now()).total_seconds()
+                    self.start_timer_position - datetime.datetime.now()).total_seconds()
             self.convert_to_procent = (self.minutes * 60 + self.seconds) / (int(self.input_work_interval) * 60 / 100)
             self.ui.progressBar.setProperty("value", self.convert_to_procent)
 
         if self.pause_time == True and self.worked_time < 4:
             self.time_difference = (self.input_small_pause_interval * 60) - (
-                        self.start_timer_position - datetime.datetime.now()).total_seconds()
+                    self.start_timer_position - datetime.datetime.now()).total_seconds()
             self.convert_to_procent = (self.minutes * 60 + self.seconds) / (self.input_small_pause_interval * 60 / 100)
             self.ui.progressBar.setProperty("value", self.convert_to_procent)
 
         if self.pause_time == True and self.worked_time == 4:
             self.time_difference = (self.input_big_pause_interval * 60) - (
-                        self.start_timer_position - datetime.datetime.now()).total_seconds()
+                    self.start_timer_position - datetime.datetime.now()).total_seconds()
             self.convert_to_procent = (self.minutes * 60 + self.seconds) / (self.input_big_pause_interval * 60 / 100)
             self.ui.progressBar.setProperty("value", self.convert_to_procent)
+
+    def refresh(self):
+        if self.counting == False:
+            pass
+        else:
+            self.ui.label_color_left.setStyleSheet("background-color: rgb(255, 170, 170);")
+            self.ui.label_color_right.setStyleSheet("background-color: rgb(255, 170, 170);")
+            self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(255, 170, 170);")
+            self.ui.label_Work_Rest.setText("Waiting...")
+            self.timer.stop()
+
+            self.milliseconds = 0
+            self.seconds = 0
+            self.minutes = 0
+            self.ui.label_timer.setText(f" 0{self.minutes}:0{self.seconds}:0{self.milliseconds}")
+
+            self.hacken = ""
+            self.ui.labe_hackenl.setText(self.hacken)  # refresh ✔
+            self.ui.labe_hackenl.setStyleSheet(
+                "background-color: rgb(0, 0, 0); color: #AAFF00; font-size: 55px; font-weight: bold;")
+            self.worked_time = 0  # how many times worked
+            self.pause_time = True  # pause False or True
+
+            # color settings
+            self.ui.label_color_left.setStyleSheet("background-color: rgb(255, 170, 170);")
+            self.ui.label_color_right.setStyleSheet("background-color: rgb(255, 170, 170);")
+            self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(255, 170, 170);")
+            self.ui.label_Work_Rest.setText("Waiting...")
+
+            self.ui.progressBar.setProperty("value", 0)
+
+
+if __name__ == '__main__':
+    app = QtWidgets.QApplication([])
+    app.cursorFlashTime()
+    widget = Tomate()
+    widget.setWindowIcon(QtGui.QIcon('.//files//tomato.ico'))
+    widget.show()
+    app.exec()
