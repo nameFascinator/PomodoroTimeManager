@@ -10,6 +10,10 @@ from UI import Ui_MainWindow
 class Tomate(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.convert_to_procent = None
+        self.timer = None
+        self.time_difference = None
+        self.start_timer_position = None
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.setWindowTitle("Tomate")  # windows Title
@@ -18,7 +22,7 @@ class Tomate(QtWidgets.QWidget):
         self.ui.labe_hackenl.setText(self.hacken)  # hacken ✔
         self.ui.labe_hackenl.setStyleSheet("background-color: rgb(0, 0, 0); color: #AAFF00; font-size: 55px; "
                                            "font-weight: bold;")
-        self.worked_time = 0  # how many times worked
+        self.worked_time = 0     # how many times worked
         self.pause_time = False  # pause or not
 
         # color waiting or pause
@@ -28,14 +32,14 @@ class Tomate(QtWidgets.QWidget):
         self.ui.label_Work_Rest.setText("Waiting...")
         ###################################################################################
 
-        # how many minutes #################################################
+        # how many minutes ################################################################
         self.timer_3 = QTimer()
         self.timer_3.setInterval(5000)
         self.timer_3.timeout.connect(self.worked_intervals)
         self.timer_3.start()
         ###################################################################################
 
-        # data and time ########################
+        # data and time ###################################################################
         self.timer_2 = QTimer()
         self.timer_2.setInterval(1000)
         self.timer_2.timeout.connect(self.date)
@@ -67,86 +71,87 @@ class Tomate(QtWidgets.QWidget):
     def worked_intervals(self):  # pause or work
         try:
             self.input_work_interval = int(self.ui.lineEdit_input_work_interval.text())
-        except:
-            pass
-
+        except ValueError:
+            print("ValueError: work_interval")
         try:
             self.input_small_pause_interval = int(self.ui.lineEdit_input_small_pause_interval.text())
-        except:
-            pass
-
+        except ValueError:
+            print("ValueError: small_pause_interval")
         try:
             self.input_big_pause_interval = int(self.ui.lineEd_input_big_pause_interval.text())
-        except:
-            pass
+        except ValueError:
+            print("ValueError: input_big_pause_interval")
 
-        if self.pause_time == False:
-            if self.worked_time < 4:
-                if self.minutes == self.input_work_interval:
-                    self.hacken = self.hacken + " ✔"
-                    self.ui.labe_hackenl.setText(self.hacken)
-                    self.worked_time = self.worked_time + 1
-                    self.pause_time = True
-                    self.ui.labe_hackenl.setText(self.hacken)
-                    self.ui.label_color_left.setStyleSheet("background-color: rgb(240, 182, 34);")
-                    self.ui.label_color_right.setStyleSheet("background-color: rgb(240, 182, 34);")
-                    self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(240, 182, 34);")
-                    self.ui.label_Work_Rest.setText("Relax!!!")
+        if not self.pause_time and self.worked_time < 4 and self.minutes == self.input_work_interval:
+            self.not_pause_time()
+        elif self.pause_time and self.worked_time < 4 and self.minutes == self.input_small_pause_interval:
+            self.pause_time_worked_less_4()
+        elif self.pause_time and self.worked_time == 4 and self.minutes == self.input_big_pause_interval:
+            self.pause_time_worked_equal_to_4()
 
-                    self.counting = False
-                    self.milliseconds = 0
-                    self.seconds = 0
-                    self.minutes = 0
-                    self.ui.label_timer.setText(f" 0{self.minutes}:0{self.seconds}:0{self.milliseconds}")
-                    self.counting = True
-                    if self.worked_time < 4:
-                        self.start_timer_position = datetime.datetime.now() + datetime.timedelta(
-                            minutes=self.input_small_pause_interval)
-                        winsound.PlaySound(".//files//Alert and Small Pause.wav", winsound.SND_ASYNC)
-                    else:
-                        self.start_timer_position = datetime.datetime.now() + datetime.timedelta(
-                            minutes=self.input_big_pause_interval)
-                        winsound.PlaySound(".//files//Alert and Big Pause.wav", winsound.SND_ASYNC)
+    def not_pause_time(self):
+        self.hacken = self.hacken + " ✔"
+        self.ui.labe_hackenl.setText(self.hacken)
+        self.worked_time = self.worked_time + 1
+        self.pause_time = True
+        self.ui.labe_hackenl.setText(self.hacken)
+        self.ui.label_color_left.setStyleSheet("background-color: rgb(240, 182, 34);")
+        self.ui.label_color_right.setStyleSheet("background-color: rgb(240, 182, 34);")
+        self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(240, 182, 34);")
+        self.ui.label_Work_Rest.setText("Relax!!!")
 
-        elif self.pause_time == True:
-            if self.worked_time < 4:
-                if self.minutes == self.input_small_pause_interval:
-                    self.start_timer_position = datetime.datetime.now() + datetime.timedelta(
-                        minutes=self.input_work_interval)
-                    self.pause_time = False
-                    self.ui.label_color_left.setStyleSheet("background-color: rgb(0, 170, 0);")
-                    self.ui.label_color_right.setStyleSheet("background-color: rgb(0, 170, 0);")
-                    self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(0, 170, 0);")
-                    self.ui.label_Work_Rest.setText("Work!!!")
-                    self.counting = False
-                    self.milliseconds = 0
-                    self.seconds = 0
-                    self.minutes = 0
-                    self.ui.label_timer.setText(f" 0{self.minutes}:0{self.seconds}:0{self.milliseconds}")
-                    self.counting = True
-            elif self.worked_time == 4:
-                if self.minutes == self.input_big_pause_interval:
-                    self.start_timer_position = datetime.datetime.now() + datetime.timedelta(
-                        minutes=self.input_work_interval)
-                    self.worked_time = 0
-                    self.milliseconds = 0
-                    self.seconds = 0
-                    self.minutes = 0
-                    self.hacken = ""
-                    self.pause_time = False
-                    self.counting = False
+        self.counting = False
+        self.milliseconds = 0
+        self.seconds = 0
+        self.minutes = 0
+        self.ui.label_timer.setText(f" 0{self.minutes}:0{self.seconds}:0{self.milliseconds}")
+        self.counting = True
+        if self.worked_time < 4:
+            self.start_timer_position = datetime.datetime.now() + datetime.timedelta(
+                minutes=self.input_small_pause_interval)
+            winsound.PlaySound(".//files//Alert and Small Pause.wav", winsound.SND_ASYNC)
+        else:
+            self.start_timer_position = datetime.datetime.now() + datetime.timedelta(
+                minutes=self.input_big_pause_interval)
+            winsound.PlaySound(".//files//Alert and Big Pause.wav", winsound.SND_ASYNC)
 
-                    self.ui.labe_hackenl.setText(self.hacken)  # refresh ✔
-                    self.ui.labe_hackenl.setStyleSheet(
-                        "background-color: rgb(0, 0, 0); color: #AAFF00; font-size: 55px; font-weight: bold;")
+    def pause_time_worked_less_4(self):
+        self.start_timer_position = datetime.datetime.now() + datetime.timedelta(
+            minutes=self.input_work_interval)
+        self.pause_time = False
+        self.ui.label_color_left.setStyleSheet("background-color: rgb(0, 170, 0);")
+        self.ui.label_color_right.setStyleSheet("background-color: rgb(0, 170, 0);")
+        self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(0, 170, 0);")
+        self.ui.label_Work_Rest.setText("Work!!!")
+        self.counting = False
+        self.milliseconds = 0
+        self.seconds = 0
+        self.minutes = 0
+        self.ui.label_timer.setText(f" 0{self.minutes}:0{self.seconds}:0{self.milliseconds}")
+        self.counting = True
 
-                    self.ui.label_color_left.setStyleSheet("background-color: rgb(0, 170, 0);")
-                    self.ui.label_color_right.setStyleSheet("background-color: rgb(0, 170, 0);")
-                    self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(0, 170, 0);")
-                    self.ui.label_Work_Rest.setText("Work!!!")
+    def pause_time_worked_equal_to_4(self):
+        self.start_timer_position = datetime.datetime.now() + datetime.timedelta(
+            minutes=self.input_work_interval)
+        self.worked_time = 0
+        self.milliseconds = 0
+        self.seconds = 0
+        self.minutes = 0
+        self.hacken = ""
+        self.pause_time = False
+        self.counting = False
 
-                    self.ui.label_timer.setText(f" 0{self.minutes}:0{self.seconds}:0{self.milliseconds}")
-                    self.counting = True
+        self.ui.labe_hackenl.setText(self.hacken)  # refresh ✔
+        self.ui.labe_hackenl.setStyleSheet(
+            "background-color: rgb(0, 0, 0); color: #AAFF00; font-size: 55px; font-weight: bold;")
+
+        self.ui.label_color_left.setStyleSheet("background-color: rgb(0, 170, 0);")
+        self.ui.label_color_right.setStyleSheet("background-color: rgb(0, 170, 0);")
+        self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(0, 170, 0);")
+        self.ui.label_Work_Rest.setText("Work!!!")
+
+        self.ui.label_timer.setText(f" 0{self.minutes}:0{self.seconds}:0{self.milliseconds}")
+        self.counting = True
 
     def date(self):
         today = datetime.datetime.now()  # time now
@@ -155,7 +160,7 @@ class Tomate(QtWidgets.QWidget):
 
     def start_timer(self):  # start counting
         self.pause_time = False
-        if self.was_paused == False:
+        if not self.was_paused:
             self.start_timer_position = datetime.datetime.now() + datetime.timedelta(minutes=self.input_work_interval,
                                                                                      seconds=0)
         else:
@@ -171,7 +176,7 @@ class Tomate(QtWidgets.QWidget):
 
         self.counting = True  # start count True
 
-        if self.counting == True:
+        if self.counting:
             self.timer = QTimer()  # create object QTimer
             self.timer.setInterval(10)  # Set the interval with which the program will call the recurring timer
             # function responsible for counting the timer.
@@ -186,8 +191,8 @@ class Tomate(QtWidgets.QWidget):
         self.was_paused = True
         self.copy_old_time_difference = int(self.minutes * 60) + int(self.seconds)
 
-        if self.counting == False:
-            pass
+        if not self.counting:
+            print("not pause_time")
         else:
             self.ui.label_color_left.setStyleSheet("background-color: rgb(255, 170, 170);")
             self.ui.label_color_right.setStyleSheet("background-color: rgb(255, 170, 170);")
@@ -234,27 +239,27 @@ class Tomate(QtWidgets.QWidget):
         self.seconds = int(self.time_difference % 60)
         self.milliseconds = int((round(self.time_difference % 60, 4) - int(round(self.time_difference % 60, 4))) * 100)
 
-        if self.pause_time == False and self.worked_time < 4:
+        if not self.pause_time and self.worked_time < 4:
             self.time_difference = (self.input_work_interval * 60) - (
                     self.start_timer_position - datetime.datetime.now()).total_seconds()
             self.convert_to_procent = (self.minutes * 60 + self.seconds) / (int(self.input_work_interval) * 60 / 100)
             self.ui.progressBar.setProperty("value", self.convert_to_procent)
 
-        if self.pause_time == True and self.worked_time < 4:
+        elif self.pause_time and self.worked_time < 4:
             self.time_difference = (self.input_small_pause_interval * 60) - (
                     self.start_timer_position - datetime.datetime.now()).total_seconds()
             self.convert_to_procent = (self.minutes * 60 + self.seconds) / (self.input_small_pause_interval * 60 / 100)
             self.ui.progressBar.setProperty("value", self.convert_to_procent)
 
-        if self.pause_time == True and self.worked_time == 4:
+        elif self.pause_time and self.worked_time == 4:
             self.time_difference = (self.input_big_pause_interval * 60) - (
                     self.start_timer_position - datetime.datetime.now()).total_seconds()
             self.convert_to_procent = (self.minutes * 60 + self.seconds) / (self.input_big_pause_interval * 60 / 100)
             self.ui.progressBar.setProperty("value", self.convert_to_procent)
 
     def refresh(self):
-        if self.counting == False:
-            pass
+        if not self.counting:
+            print("counting is false")
         else:
             self.ui.label_color_left.setStyleSheet("background-color: rgb(255, 170, 170);")
             self.ui.label_color_right.setStyleSheet("background-color: rgb(255, 170, 170);")
@@ -271,7 +276,7 @@ class Tomate(QtWidgets.QWidget):
             self.ui.labe_hackenl.setText(self.hacken)  # refresh ✔
             self.ui.labe_hackenl.setStyleSheet(
                 "background-color: rgb(0, 0, 0); color: #AAFF00; font-size: 55px; font-weight: bold;")
-            self.worked_time = 0  # how many times worked
+            self.worked_time = 0    # how many times worked
             self.pause_time = True  # pause False or True
 
             # color settings
@@ -279,7 +284,6 @@ class Tomate(QtWidgets.QWidget):
             self.ui.label_color_right.setStyleSheet("background-color: rgb(255, 170, 170);")
             self.ui.label_Work_Rest.setStyleSheet("background-color: rgb(255, 170, 170);")
             self.ui.label_Work_Rest.setText("Waiting...")
-
             self.ui.progressBar.setProperty("value", 0)
 
 
